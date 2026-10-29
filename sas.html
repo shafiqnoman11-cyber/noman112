@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    from pathlib import Path
+import shutil, zipfile
+
+base = Path("/mnt/data/ak_fast_food_website")
+base.mkdir(exist_ok=True)
+
+# Use the generated banner image from the conversation.
+banner_src = Path("/mnt/data/a_bold_high_contrast_advertising_banner_poster.png")
+if banner_src.exists():
+    shutil.copy2(banner_src, base / "banner.png")
+
+html = r'''<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AK Fast Food — burgers, pizza, fries and drinks delivered fast.">
+  <title>AK Fast Food | Good Food, Good Mood</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <a href="#home" class="logo"><span>AK</span><small>FAST FOOD</small></a>
+    <button class="menu-toggle" aria-label="Open menu">☰</button>
+    <nav class="nav">
+      <a href="#home" class="active">Home</a>
+      <a href="#menu">Menu</a>
+      <a href="#about">About</a>
+      <a href="#offers">Offers</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <button class="cart-btn" id="cartBtn" aria-label="Open cart">🛒 <b id="cartCount">0</b></button>
+    <a href="#menu" class="btn btn-primary">Order Now <span>→</span></a>
+  </header>
+
+  <main>
+    <section id="home" class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Delicious Food • Happy You!</p>
+        <h1>GOOD FOOD<br><em>GOOD MOOD</em></h1>
+        <p class="hero-text">Fresh ingredients, bold flavors and fast delivery. Your favorite fast food is only one click away.</p>
+        <div class="hero-actions">
+          <a href="#menu" class="btn btn-primary">Order Now <span>→</span></a>
+          <a href="#menu" class="btn btn-outline">View Menu</a>
+        </div>
+        <div class="features">
+          <div>🍔 <span>Tasty Food<br><small>You Love</small></span></div>
+          <div>🛵 <span>Fast Delivery<br><small>30–45 Minutes</small></span></div>
+          <div>🏆 <span>Premium<br><small>Quality</small></span></div>
+        </div>
+      </div>
+      <div class="hero-image">
+        <img src="banner.png" alt="AK Fast Food burger and happy customer">
+      </div>
+    </section>
+
+    <section class="categories">
+      <a href="#menu" data-filter="Burger">🍔<span>Burgers</span></a>
+      <a href="#menu" data-filter="Pizza">🍕<span>Pizza</span></a>
+      <a href="#menu" data-filter="Fries">🍟<span>Fries</span></a>
+      <a href="#menu" data-filter="Drink">🥤<span>Drinks</span></a>
+      <a href="#menu" data-filter="Dessert">🍦<span>Desserts</span></a>
+    </section>
+
+    <section id="menu" class="section">
+      <div class="section-head">
+        <div><p class="eyebrow">Popular Items</p><h2>Our Most Loved Food</h2></div>
+        <div class="filters">
+          <button class="filter active" data-filter="All">All</button>
+          <button class="filter" data-filter="Burger">Burgers</button>
+          <button class="filter" data-filter="Pizza">Pizza</button>
+          <button class="filter" data-filter="Fries">Fries</button>
+          <button class="filter" data-filter="Drink">Drinks</button>
+        </div>
+      </div>
+      <div id="products" class="product-grid"></div>
+    </section>
+
+    <section id="offers" class="offer">
+      <div>
+        <p class="eyebrow">Limited Time Offer</p>
+        <h2>GET <strong>20% OFF</strong></h2>
+        <p>On your first order. Use code <b>AK20</b> at checkout.</p>
+        <a href="#menu" class="btn btn-primary">Order Now →</a>
+      </div>
+      <div class="offer-art">🍔</div>
+    </section>
+
+    <section id="about" class="about section">
+      <div>
+        <p class="eyebrow">Why AK Fast Food?</p>
+        <h2>Fresh. Fast. Full of Flavor.</h2>
+        <p>We make comfort food with quality ingredients, generous portions and a whole lot of good mood. Whether you want a quick lunch or a late-night feast, AK has you covered.</p>
+      </div>
+      <div class="stats">
+        <div><b>30–45</b><span>Min Delivery</span></div>
+        <div><b>100%</b><span>Fresh Taste</span></div>
+        <div><b>20%</b><span>First Order Off</span></div>
+      </div>
+    </section>
+
+    <section id="contact" class="contact section">
+      <div><p class="eyebrow">Get In Touch</p><h2>Hungry? Let's Talk.</h2></div>
+      <div class="contact-cards">
+        <a href="tel:+923001234567">📞 +92 300 1234567</a>
+        <a href="mailto:hello@akfastfood.com">✉️ hello@akfastfood.com</a>
+        <span>📍 Karachi, Pakistan</span>
+      </div>
+    </section>
+  </main>
+
+  <footer><span>© 2026 AK Fast Food</span><span>Good Food • Good Mood</span></footer>
+
+  <div class="cart-panel" id="cartPanel">
+    <div class="cart-head"><h2>Your Cart</h2><button id="closeCart">✕</button></div>
+    <div id="cartItems" class="cart-items"><p class="empty">Your cart is empty.</p></div>
+    <div class="cart-total"><span>Total</span><strong id="cartTotal">Rs. 0</strong></div>
+    <button class="btn btn-primary checkout" id="checkout">Checkout</button>
+  </div>
+  <div class="overlay" id="overlay"></div>
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+'''
+
+css = r'''@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root{--bg:#0b0b0b;--card:#141414;--gold:#ffb400;--white:#fff;--muted:#aaa;--line:#292929}
+*{box-sizing:border-box;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--white);font-family:Inter,Arial,sans-serif}
+a{text-decoration:none;color:inherit}
+.header{height:82px;display:flex;align-items:center;gap:28px;padding:0 6%;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;background:rgba(11,11,11,.94);backdrop-filter:blur(12px)}
+.logo{font-weight:800;font-size:34px;line-height:.75;color:var(--gold);min-width:100px}.logo small{display:block;color:#fff;font-size:9px;letter-spacing:2px;margin-left:31px;margin-top:8px}
+.nav{display:flex;gap:30px;margin:auto}.nav a{color:#ddd;font-weight:600;font-size:14px;padding:30px 0}.nav a:hover,.nav a.active{color:var(--gold)}
+.cart-btn{background:none;border:0;color:white;font-size:19px;cursor:pointer;position:relative}.cart-btn b{position:absolute;background:var(--gold);color:#111;border-radius:50%;font-size:10px;width:19px;height:19px;top:-9px;right:-10px;display:grid;place-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:14px;padding:15px 24px;border-radius:8px;font-weight:800;border:1px solid transparent;cursor:pointer}.btn-primary{background:var(--gold);color:#111}.btn-primary:hover{filter:brightness(1.08);transform:translateY(-1px)}.btn-outline{border-color:#777}.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.hero{min-height:620px;display:grid;grid-template-columns:43% 57%;align-items:center;padding:45px 5% 25px;overflow:hidden;background:radial-gradient(circle at 80% 45%,#332400 0,#0b0b0b 38%)}
+.hero-copy{padding-left:3%}.eyebrow{color:var(--gold);font-family:'Bebas Neue';font-size:21px;letter-spacing:1.5px;margin:0 0 8px}
+h1,h2{font-family:'Bebas Neue';margin:0;line-height:.9;letter-spacing:1px}h1{font-size:86px}h1 em{font-style:normal;color:var(--gold)}h2{font-size:48px}.hero-text{max-width:510px;color:#c6c6c6;line-height:1.7;margin:22px 0}.hero-actions{display:flex;gap:14px}.features{display:flex;gap:20px;margin-top:38px}.features>div{display:flex;gap:9px;align-items:center;color:var(--gold);font-size:23px}.features span{color:#fff;font-size:11px;line-height:1.2}.features small{color:#888;font-size:9px}.hero-image{height:100%;display:flex;align-items:center;justify-content:center}.hero-image img{width:100%;max-height:590px;object-fit:cover;object-position:center;border-radius:18px;box-shadow:0 20px 70px rgba(0,0,0,.5)}
+.categories{margin:-1px 6% 50px;border:1px solid var(--line);border-radius:14px;display:grid;grid-template-columns:repeat(5,1fr);background:#101010;overflow:hidden}.categories a{padding:22px;text-align:center;border-right:1px solid var(--line);font-size:28px}.categories a:last-child{border:0}.categories span{display:block;font-size:13px;color:#ddd;margin-top:8px;font-weight:700}.categories a:hover{background:#191919;color:var(--gold)}
+.section{padding:70px 6%}.section-head{display:flex;align-items:end;justify-content:space-between;margin-bottom:30px}.filters{display:flex;gap:7px;flex-wrap:wrap}.filter{background:transparent;color:#aaa;border:1px solid var(--line);padding:9px 14px;border-radius:20px;cursor:pointer}.filter.active,.filter:hover{background:var(--gold);color:#111;border-color:var(--gold)}
+.product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.product{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;transition:.2s}.product:hover{transform:translateY(-5px);border-color:#5a4300}.product-img{height:180px;display:grid;place-items:center;font-size:85px;background:radial-gradient(circle,#2a210d,#151515)}.product-body{padding:16px}.product-body h3{margin:0 0 7px}.product-body p{color:#888;font-size:12px;margin:0 0 13px}.price{color:var(--gold);font-weight:800}.add{float:right;border:0;border-radius:50%;width:34px;height:34px;background:var(--gold);font-size:20px;cursor:pointer}
+.offer{margin:20px 6% 30px;padding:35px 5%;border:1px solid #5a4300;border-radius:18px;background:linear-gradient(110deg,#211700,#0f0f0f);display:flex;justify-content:space-between;align-items:center;overflow:hidden}.offer h2{font-size:64px}.offer h2 strong{color:var(--gold)}.offer p:not(.eyebrow){color:#aaa}.offer-art{font-size:150px;transform:rotate(-10deg)}
+.about{display:grid;grid-template-columns:1fr 1fr;gap:50px}.about p:not(.eyebrow){color:#aaa;line-height:1.8;max-width:650px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stats div{background:#121212;border:1px solid var(--line);padding:25px;text-align:center;border-radius:12px}.stats b{display:block;color:var(--gold);font-size:30px}.stats span{color:#999;font-size:11px}
+.contact{border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.contact-cards{display:flex;gap:10px;flex-wrap:wrap}.contact-cards>*{border:1px solid var(--line);padding:15px;border-radius:9px;color:#ccc}
+footer{padding:25px 6%;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:#777;font-size:12px}
+.cart-panel{position:fixed;right:-430px;top:0;width:min(410px,100%);height:100vh;background:#111;z-index:50;padding:25px;box-shadow:-20px 0 50px #000;transition:.3s}.cart-panel.open{right:0}.cart-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:18px}.cart-head button{background:none;border:0;color:#fff;font-size:20px;cursor:pointer}.cart-items{min-height:55vh;padding:20px 0}.cart-row{display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:1px solid var(--line)}.cart-row small{color:#888;display:block}.qty button{background:#222;color:white;border:1px solid #444;width:26px;height:26px;cursor:pointer}.qty span{padding:0 8px}.empty{color:#777;text-align:center;margin-top:100px}.cart-total{display:flex;justify-content:space-between;font-size:18px;border-top:1px solid var(--line);padding:20px 0}.cart-total strong{color:var(--gold)}.checkout{width:100%}.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:40}.overlay.show{display:block}.toast{position:fixed;bottom:25px;left:50%;transform:translate(-50%,20px);background:var(--gold);color:#111;padding:12px 20px;border-radius:8px;font-weight:700;opacity:0;pointer-events:none;transition:.25s;z-index:60}.toast.show{opacity:1;transform:translate(-50%,0)}
+.menu-toggle{display:none;background:none;border:0;color:#fff;font-size:25px}
+@media(max-width:900px){.header{padding:0 4%;gap:14px}.nav{position:absolute;top:82px;left:0;right:0;background:#111;display:none;flex-direction:column;gap:0;padding:10px 5%;border-bottom:1px solid var(--line)}.nav.open{display:flex}.nav a{padding:14px 0}.menu-toggle{display:block;order:2}.nav{order:3}.cart-btn{margin-left:auto}.header>.btn{display:none}.hero{grid-template-columns:1fr;padding:45px 5%}.hero-copy{padding:0}.hero-image{margin-top:30px}.product-grid{grid-template-columns:repeat(2,1fr)}.categories{grid-template-columns:repeat(5,1fr);margin-left:5%;margin-right:5%}.categories a{padding:14px 5px;font-size:22px}.section{padding:55px 5%}.section-head{display:block}.filters{margin-top:20px}.about{grid-template-columns:1fr}.contact{display:block}.contact-cards{margin-top:25px}}
+@media(max-width:560px){h1{font-size:58px}h2{font-size:40px}.features{gap:10px}.features>div{font-size:18px}.categories span{font-size:9px}.product-grid{grid-template-columns:1fr}.product-img{height:210px}.offer{padding:28px}.offer h2{font-size:48px}.offer-art{font-size:80px}.stats{grid-template-columns:1fr}.contact-cards{display:grid}.contact-cards>*{font-size:12px}footer{display:block}footer span{display:block;margin:5px 0}}
+'''
+
+js = r'''const products = [
+  {id:1,name:"Zinger Burger",cat:"Burger",price:550,icon:"🍔",desc:"Crispy chicken, cheese & special sauce"},
+  {id:2,name:"AK Beef Burger",cat:"Burger",price:650,icon:"🍔",desc:"Juicy beef patty, cheese & fresh salad"},
+  {id:3,name:"Chicken Pizza",cat:"Pizza",price:900,icon:"🍕",desc:"Chicken, mozzarella & signature sauce"},
+  {id:4,name:"Pepperoni Pizza",cat:"Pizza",price:1050,icon:"🍕",desc:"Pepperoni, mozzarella & herbs"},
+  {id:5,name:"French Fries",cat:"Fries",price:250,icon:"🍟",desc:"Crispy golden fries with seasoning"},
+  {id:6,name:"Loaded Fries",cat:"Fries",price:420,icon:"🍟",desc:"Fries topped with cheese & chicken"},
+  {id:7,name:"Cold Drink",cat:"Drink",price:150,icon:"🥤",desc:"Ice-cold refreshing soft drink"},
+  {id:8,name:"Chocolate Shake",cat:"Drink",price:350,icon:"🥤",desc:"Rich creamy chocolate shake"}
+];
+
+let cart = JSON.parse(localStorage.getItem("akCart") || "[]");
+const productsEl=document.getElementById("products"), cartCount=document.getElementById("cartCount");
+const cartPanel=document.getElementById("cartPanel"), overlay=document.getElementById("overlay");
+const cartItems=document.getElementById("cartItems"), cartTotal=document.getElementById("cartTotal"), toast=document.getElementById("toast");
+
+function money(n){return "Rs. " + n.toLocaleString("en-PK")}
+function renderProducts(filter="All"){
+  productsEl.innerHTML=products.filter(p=>filter==="All"||p.cat===filter).map(p=>`
+    <article class="product">
+      <div class="product-img">${p.icon}</div>
+      <div class="product-body">
+        <h3>${p.name}</h3><p>${p.desc}</p>
+        <span class="price">${money(p.price)}</span>
+        <button class="add" onclick="addToCart(${p.id})">+</button>
+      </div>
+    </article>`).join("");
+}
+function addToCart(id){
+  const item=cart.find(x=>x.id===id);
+  if(item)item.qty++;
+  else cart.push({id,qty:1});
+  save(); showToast("Added to cart ✓");
+}
+function changeQty(id,delta){
+  const item=cart.find(x=>x.id===id);
+  if(!item)return;
+  item.qty+=delta;
+  if(item.qty<=0)cart=cart.filter(x=>x.id!==id);
+  save();
+}
+function save(){localStorage.setItem("akCart",JSON.stringify(cart));renderCart()}
+function renderCart(){
+  const count=cart.reduce((s,x)=>s+x.qty,0);
+  cartCount.textContent=count;
+  if(!cart.length){cartItems.innerHTML='<p class="empty">Your cart is empty.</p>';cartTotal.textContent="Rs. 0";return}
+  let total=0;
+  cartItems.innerHTML=cart.map(x=>{
+    const p=products.find(p=>p.id===x.id), sub=p.price*x.qty; total+=sub;
+    return `<div class="cart-row"><div><b>${p.name}</b><small>${money(p.price)} each</small></div>
+      <div class="qty"><button onclick="changeQty(${p.id},-1)">−</button><span>${x.qty}</span><button onclick="changeQty(${p.id},1)">+</button></div></div>`;
+  }).join("");
+  cartTotal.textContent=money(total);
+}
+function openCart(){cartPanel.classList.add("open");overlay.classList.add("show")}
+function closeCart(){cartPanel.classList.remove("open");overlay.classList.remove("show")}
+function showToast(msg){toast.textContent=msg;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),1800)}
+
+document.querySelectorAll(".filter").forEach(btn=>btn.addEventListener("click",()=>{
+  document.querySelectorAll(".filter").forEach(b=>b.classList.remove("active"));btn.classList.add("active");renderProducts(btn.dataset.filter);
+}));
+document.querySelectorAll(".categories a").forEach(a=>a.addEventListener("click",()=>{
+  const f=a.dataset.filter;
+  document.querySelectorAll(".filter").forEach(b=>b.classList.toggle("active",b.dataset.filter===f));
+  setTimeout(()=>renderProducts(f),0);
+}));
+document.getElementById("cartBtn").onclick=openCart;
+document.getElementById("closeCart").onclick=closeCart;
+overlay.onclick=closeCart;
+document.getElementById("checkout").onclick=()=>{
+  if(!cart.length){showToast("Your cart is empty");return}
+  showToast("Order ready! Connect your payment/WhatsApp here.");
+};
+document.querySelector(".menu-toggle").onclick=()=>document.querySelector(".nav").classList.toggle("open");
+document.querySelectorAll(".nav a").forEach(a=>a.onclick=()=>document.querySelector(".nav").classList.remove("open"));
+
+renderProducts();renderCart();
+'''
+
+(base/"index.html").write_text(html, encoding="utf-8")
+(base/"style.css").write_text(css, encoding="utf-8")
+(base/"script.js").write_text(js, encoding="utf-8")
+
+zip_path = Path("/mnt/data/AK_Fast_Food_Website.zip")
+with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
+    for f in base.iterdir():
+        z.write(f, f.name)
+
+print("Website created successfully.")
+print(f"Files: {', '.join(p.name for p in base.iterdir())}")
+print(f"ZIP: {zip_path}")
+
+</style>
+<body>
+    
+</body>
+</html>

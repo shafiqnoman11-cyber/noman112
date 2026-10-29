@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body{text-align: center;}
+    #main{
+        height: 400px;
+        width: 800px;
+        border-radius: 20px;
+        border: 3px solid black;
+        transition: 0.5s;
+    }
+    .gallery img{
+        height: 150px;
+        width: 200px;
+        border-radius: 10px;
+        border: 3px solid black;
+    }
+</style>
+<body>
+
+
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSw5QKjk0iCwRJ0suw_PRLLPDxBoRPJHZfl-U6olrVa_A&s=10" id="main" alt="">
+
+    <div class="gallery">
+        <img src="https://www.stockvault.net/data/2007/03/01/100489/thumb16.jpg" onclick="changeimg(this)"  alt="">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbOfVPkc0Ws94hHiSorovU0JHNaMX8Z2AWG7G5Cf-SQ9VcHrzi5bEyDNs&s=10" onclick="changeimg(this)"  alt="">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6vh6yMErik57bz2XSP9o2Tjw9kn0pV6tRVZ866Bn59rhLNosQN66GUJg&s=10" onclick="changeimg(this)"  alt="">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVIivdx8Q6KgrtZwYIpcVQ821IYWAM0fXM-2SfoUTVn6KjZhEjf2inVm8-&s=10" onclick="changeimg(this)"  alt="">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAyDF3XhYLunSfIFBO6Cv5F06H51F34AdPuYeiAt0ocalckDXFwBW0e5g&s=10" onclick="changeimg(this)"  alt="">
+    </div>
+
+    <script>
+
+        function changeimg(box){
+
+            var main = document.getElementById("main")
+
+            main.style.opacity = "0"
+
+            setTimeout(function (){
+                main.src = box.src
+
+                main.style.opacity="1"
+            },400)
+
+
+
+        }
+
+    </script>
+    
+</body>
+</html>

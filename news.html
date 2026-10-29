@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+       <h1 id="text">muhammad nomnan</h1>
+       <button onclick="run()">click me</button>
+
+       <script>
+             var texts =["usman","asad","shafiq","aqeel"]
+             var colors =["red","green","blur","cyan"]
+             var sizes =["20px","40px","60px","80px"]
+             var i=0;
+
+             function run(){
+                 var title= document.getElementById("text")
+
+                 title.innerHTML =texts [i]
+                 title.style.color =colors [i]
+                 title.style.fontSize =sizes [i]
+
+                 i++
+                 if(i>=colors.length)i=0
+             }
+       </script>
+</body>
+</html>
